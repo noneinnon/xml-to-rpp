@@ -57,8 +57,6 @@ def upload_file():
     return render_template("index.html")
 
 # download processed file
-
-
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     @after_this_request
