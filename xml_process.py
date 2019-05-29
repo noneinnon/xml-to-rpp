@@ -3,10 +3,10 @@ import os
 
 
 class Converter:
-    def __init__(self, path):
-        self.path = path
-        self.tree = ET.parse(path)
-        self.output = os.path.splitext(os.path.basename(path))[0] + '.rpp'
+    def __init__(self, filestring):
+        self.filestring = filestring
+        self.tree = ET.fromstring(filestring)
+        #self.output = os.path.splitext(os.path.basename(filestring))[0] + '.rpp'
         self.framerate = int(self.tree.find('sequence/rate/timebase').text)
         self.sample_rate = 480000
     # Divides frames by framerate to get seconds, rounds to 14 decimal
@@ -143,13 +143,31 @@ class Converter:
                 for line in bottom:
                     f.write(line)
 
-    def announce(self, media_items):
-        video_files = []
-        for mediaitem in media_items[0].keys():
+    def convert_to_string(self):
 
-            if mediaitem in media_items[1].keys():
-                video_files.append(mediaitem)
+        with open('head.rpp', 'r') as head:
+            string = "".join(head.readlines())
+        for track_counter, track in enumerate(self.tree.findall('sequence/media/audio/track')):
+            string = string + self.reaper_track(track_counter + 1)
+            for counter, clipitem in enumerate(track.iterfind('clipitem')):
+                    # collects item data and media info
+                clip_id = counter + 1
+                clip_dict = self.create_tag_dict(clipitem)
+                # Writes to formatted Reaper <ITEM> string
+                string = string + self.reaper_item(clip_dict, clip_id)
+            string = string + '''            >'''
+        with open('bottom.rpp', 'r') as bottom:
+            string = string + "".join(bottom.readlines())
+        #string = string.replace("\n", "\r\n")
+        return string
 
-        if len(video_files) > 0:
-            for file in video_files:
-                print(file + ' -----' + ' copy this file into .rpp project folder.')
+    # def announce(self, media_items):
+    #     video_files = []
+    #     for mediaitem in media_items[0].keys():
+
+    #         if mediaitem in media_items[1].keys():
+    #             video_files.append(mediaitem)
+
+    #     if len(video_files) > 0:
+    #         for file in video_files:
+    #             print(file + ' -----' + ' copy this file into .rpp project folder.')
