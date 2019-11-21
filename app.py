@@ -22,9 +22,6 @@ def process_file(string):
     converter = Converter(filestring=string)
     return converter.convert_to_string()
 
-# home page
-
-
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
