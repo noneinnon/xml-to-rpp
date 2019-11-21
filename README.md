@@ -5,5 +5,5 @@ It can be used to exchange session data between editors and sound mixers.
 ### TO-DO
 Add support for different XML types
 
-# FAQ
+### FAQ
 If you have questions or suggestions, please don't hesitate to contact me!
